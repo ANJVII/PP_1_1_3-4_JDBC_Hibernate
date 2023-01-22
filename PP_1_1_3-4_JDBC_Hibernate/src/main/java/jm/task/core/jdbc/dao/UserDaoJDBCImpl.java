@@ -98,7 +98,6 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> users = new ArrayList<>();
         String select = "select * from users";
         try (Statement statement = util.getConnection().createStatement()) {
-            statement.execute("BEGIN");
             ResultSet resultSet = statement.executeQuery(select);
             while (resultSet.next()) {
                 User user = new User();
@@ -111,11 +110,6 @@ public class UserDaoJDBCImpl implements UserDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            try {
-                util.getConnection().rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
         }
         return users;
     }
