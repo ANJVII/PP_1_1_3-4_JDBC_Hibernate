@@ -1,10 +1,10 @@
 package jm.task.core.jdbc.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "users", schema = "public")
+@Table(name = "users", schema = "mydbtest")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -32,17 +32,17 @@ public class Util {
 
         //Hibernate
         Properties properties = new Properties();
-        properties.setProperty("connection.url", URL);
-        properties.setProperty("connection.username", USERNAME);
-        properties.setProperty("connection.password", PASSWORD);
+        properties.setProperty("hibernate.connection.url", URL);
+        properties.setProperty("hibernate.connection.username", USERNAME);
+        properties.setProperty("hibernate.connection.password", PASSWORD);
 
-        properties.setProperty("connection.driver_class", "com.mysql.cj.jdbc.Driver");
+        properties.setProperty("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        properties.setProperty("show_sql", "true");
-        properties.setProperty("format_sql", "true");
+        properties.setProperty("hibernate.show_sql", "true");
+        properties.setProperty("hibernate.format_sql", "true");
 
         Configuration configuration = new Configuration();
-        configuration.configure();
+
         configuration.setProperties(properties);
         configuration.addAnnotatedClass(jm.task.core.jdbc.model.User.class);
         sessionFactory = configuration.buildSessionFactory();

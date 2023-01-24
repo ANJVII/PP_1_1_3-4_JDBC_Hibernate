@@ -25,7 +25,7 @@ public class Main {
             System.out.println(user);
         }
         service.cleanUsersTable();
-        service.dropUsersTable();
+        //service.dropUsersTable();
 
         // Hibernate (пока что не работает:с)
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
