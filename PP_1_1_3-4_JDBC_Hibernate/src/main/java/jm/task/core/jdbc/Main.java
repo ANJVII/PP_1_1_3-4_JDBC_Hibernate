@@ -15,8 +15,8 @@ public class Main {
     public static void main(String[] args) {
         // реализуйте алгоритм здесь
         // Реализация через jdbc
-        UserService service = new UserServiceImpl();
-        service.createUsersTable();
+        UserService service = new UserServiceImpl();            // по идее открытие транзакции надо делать здесь
+        service.createUsersTable();                             // и выполнять пачку запросов, но я не знаю как (новый метод?)
         service.saveUser("Иван", "Иванов", (byte) 34);
         service.saveUser("Петя", "Петров", (byte) 24);
         service.saveUser("Маша", "Иванова", (byte) 20);
@@ -27,17 +27,15 @@ public class Main {
         service.cleanUsersTable();
         service.dropUsersTable();
 
-        /*
+        // Hibernate (пока что не работает:с)
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
 
-        try (SessionFactory sessionFactory = new Util().getSessionFactory();
-             Session session = sessionFactory.openSession()) {
+        try (Session session =  new Util().getSessionFactory().openSession()) {
             session.beginTransaction();
             System.out.println("OK");
             User user = new User("Name", "LastName", (byte) 33);
             session.save(user);
             session.getTransaction().commit();
         }
-        */
     }
 }

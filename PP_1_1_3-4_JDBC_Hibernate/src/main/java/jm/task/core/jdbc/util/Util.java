@@ -1,5 +1,6 @@
 package jm.task.core.jdbc.util;
 
+import jm.task.core.jdbc.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -8,6 +9,7 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class Util {
     // реализуйте настройку соеденения с БД
@@ -29,10 +31,22 @@ public class Util {
         }
 
         //Hibernate
+        Properties properties = new Properties();
+        properties.setProperty("connection.url", URL);
+        properties.setProperty("connection.username", USERNAME);
+        properties.setProperty("connection.password", PASSWORD);
+
+        properties.setProperty("connection.driver_class", "com.mysql.cj.jdbc.Driver");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        properties.setProperty("show_sql", "true");
+        properties.setProperty("format_sql", "true");
 
         Configuration configuration = new Configuration();
         configuration.configure();
+        configuration.setProperties(properties);
+        configuration.addAnnotatedClass(jm.task.core.jdbc.model.User.class);
         sessionFactory = configuration.buildSessionFactory();
+
     }
     public Connection getConnection() {
         return connection;
