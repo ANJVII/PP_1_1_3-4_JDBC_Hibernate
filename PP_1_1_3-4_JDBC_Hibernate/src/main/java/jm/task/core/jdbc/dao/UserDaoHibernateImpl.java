@@ -22,7 +22,6 @@ public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() { //пустой конструктор
     }
 
-
     @Override
     public void createUsersTable() {
         Transaction transaction = null;
@@ -108,7 +107,7 @@ public class UserDaoHibernateImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         try (Session session = sessionFactory.openSession()) {
-            CriteriaBuilder cb = session.getCriteriaBuilder();//session.createSQLQuery("select * from users").getResultList() no run
+            CriteriaBuilder cb = session.getCriteriaBuilder();      //session.createSQLQuery("select * from users").getResultList() no run
             CriteriaQuery cq = cb.createQuery(User.class);
             Root rootEntry = cq.from(User.class);
             CriteriaQuery all = cq.select(rootEntry);
@@ -129,7 +128,7 @@ public class UserDaoHibernateImpl implements UserDao {
             if (transaction.getStatus().equals(TransactionStatus.NOT_ACTIVE)) {
                 transaction.begin();
             }
-            session.createSQLQuery("delete from users");
+            session.createSQLQuery("delete from users").executeUpdate();
             transaction.commit();
         } catch (HibernateException e) {
             e.printStackTrace();
