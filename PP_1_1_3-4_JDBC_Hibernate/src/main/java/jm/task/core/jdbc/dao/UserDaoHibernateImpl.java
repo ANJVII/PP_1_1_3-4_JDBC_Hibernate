@@ -6,13 +6,19 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
 
     private SessionFactory sessionFactory = new Util().getSessionFactory();
+
     public UserDaoHibernateImpl() { //пустой конструктор
     }
 
@@ -20,21 +26,24 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void createUsersTable() {
         Transaction transaction = null;
-        try (Session session =  sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.getTransaction();
+            if (transaction.getStatus().equals(TransactionStatus.NOT_ACTIVE)) {  //проверка в необходимости запуска
+                transaction.begin();                                             //транзакции
+            }
             session.createSQLQuery("create table if not exists users\n" +
-            "(\n" +
+                    "(\n" +
                     "    id       BIGINT auto_increment\n" +
                     "        primary key,\n" +
                     "    name     VARCHAR(20) not null,\n" +
                     "    lastName VARCHAR(50) null,\n" +
                     "    age      TINYINT     null\n" +
-                    ");");
+                    ");").executeUpdate();
             System.out.println(transaction.getStatus());
             transaction.commit();
         } catch (HibernateException e) {
             e.printStackTrace();
-            if(transaction !=null) {
+            if (transaction != null) {
                 transaction.rollback();
             }
         }
@@ -43,13 +52,16 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void dropUsersTable() {
         Transaction transaction = null;
-        try (Session session =  sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.getTransaction();
-            session.createSQLQuery("drop table if exists users");
+            if (transaction.getStatus().equals(TransactionStatus.NOT_ACTIVE)) {
+                transaction.begin();
+            }
+            session.createSQLQuery("drop table if exists users").executeUpdate();
             transaction.commit();
         } catch (HibernateException e) {
             e.printStackTrace();
-            if(transaction !=null) {
+            if (transaction != null) {
                 transaction.rollback();
             }
         }
@@ -58,13 +70,16 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Transaction transaction = null;
-        try (Session session =  sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
+            if (transaction.getStatus().equals(TransactionStatus.NOT_ACTIVE)) {
+                transaction.begin();
+            }
             session.save(new User(name, lastName, age));
             transaction.commit();
         } catch (HibernateException e) {
             e.printStackTrace();
-            if(transaction !=null) {
+            if (transaction != null) {
                 transaction.rollback();
             }
         }
@@ -73,14 +88,17 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void removeUserById(long id) {
         Transaction transaction = null;
-        try (Session session =  sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            Object user = session.get("User", id);
+            if (transaction.getStatus().equals(TransactionStatus.NOT_ACTIVE)) {
+                transaction.begin();
+            }
+            User user = session.get(User.class, id);
             session.delete(user);
             transaction.commit();
         } catch (HibernateException e) {
             e.printStackTrace();
-            if(transaction !=null) {
+            if (transaction != null) {
                 transaction.rollback();
             }
         }
@@ -89,8 +107,14 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        try (Session session =  sessionFactory.openSession()) {
-            users = session.createSQLQuery("select * from users").getResultList();
+        try (Session session = sessionFactory.openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();//session.createSQLQuery("select * from users").getResultList() no run
+            CriteriaQuery cq = cb.createQuery(User.class);
+            Root rootEntry = cq.from(User.class);
+            CriteriaQuery all = cq.select(rootEntry);
+
+            TypedQuery allQuery = session.createQuery(all);
+            users = allQuery.getResultList();
         } catch (HibernateException e) {
             e.printStackTrace();
         }
@@ -100,12 +124,16 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void cleanUsersTable() {
         Transaction transaction = null;
-        try (Session session =  sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.getTransaction();
+            if (transaction.getStatus().equals(TransactionStatus.NOT_ACTIVE)) {
+                transaction.begin();
+            }
             session.createSQLQuery("delete from users");
+            transaction.commit();
         } catch (HibernateException e) {
             e.printStackTrace();
-            if(transaction !=null) {
+            if (transaction != null) {
                 transaction.rollback();
             }
         }
