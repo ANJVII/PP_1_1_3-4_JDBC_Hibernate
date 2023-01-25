@@ -1,6 +1,7 @@
 package jm.task.core.jdbc;
 
 
+import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
@@ -14,9 +15,9 @@ import java.util.logging.Level;
 public class Main {
     public static void main(String[] args) {
         // реализуйте алгоритм здесь
-        // Реализация через jdbc
-        UserService service = new UserServiceImpl();            // по идее открытие транзакции надо делать здесь
-        service.createUsersTable();                             // и выполнять пачку запросов, но я не знаю как (новый метод?)
+        // Реализация через Hibernate
+        UserService service = new UserServiceImpl();
+        service.createUsersTable();
         service.saveUser("Иван", "Иванов", (byte) 34);
         service.saveUser("Петя", "Петров", (byte) 24);
         service.saveUser("Маша", "Иванова", (byte) 20);
@@ -25,17 +26,6 @@ public class Main {
             System.out.println(user);
         }
         service.cleanUsersTable();
-        //service.dropUsersTable();
-
-        // Hibernate (пока что не работает:с)
-        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
-
-        try (Session session =  new Util().getSessionFactory().openSession()) {
-            session.beginTransaction();
-            System.out.println("OK");
-            User user = new User("Name", "LastName", (byte) 33);
-            session.save(user);
-            session.getTransaction().commit();
-        }
+        service.dropUsersTable();
     }
 }

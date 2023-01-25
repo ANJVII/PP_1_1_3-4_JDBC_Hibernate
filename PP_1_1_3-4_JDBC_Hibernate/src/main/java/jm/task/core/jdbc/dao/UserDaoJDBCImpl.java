@@ -23,13 +23,12 @@ public class UserDaoJDBCImpl implements UserDao {
                 "    age      TINYINT     null\n" +
                 ");";
         try (Statement statement = connection.createStatement()) {
-            statement.execute("start transaction"); //начало транзакции
             statement.execute(creatTable);
-            connection.commit();                        //конец транзакции
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                connection.rollback();                  //сброс невыполненных запросов
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -39,7 +38,6 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         String drop = "drop table if exists users";
         try (Statement statement = connection.createStatement()) {
-            statement.execute("start transaction");
             statement.executeUpdate(drop);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -110,7 +108,6 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         String cleanTable = "delete from users";
         try (Statement statement = connection.createStatement()) {
-            statement.execute("start transaction");
             statement.execute(cleanTable);
             connection.commit();
         } catch (SQLException e) {
